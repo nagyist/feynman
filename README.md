@@ -1,0 +1,87 @@
+# Feynman
+
+`feynman` is a research-first agent scaffold built on `@mariozechner/pi-coding-agent`.
+
+It keeps the useful parts of a coding agent:
+- file access
+- shell execution
+- persistent sessions
+- skills
+- custom extensions
+
+But it biases the runtime toward research work:
+- literature review
+- paper lookup
+- replication planning
+- experiment design
+- writing notes and reports
+
+The primary paper backend is `@companion-ai/alpha-hub` and your alphaXiv account.
+The rest of the workflow is augmented through a curated `.pi/settings.json` package stack.
+
+## Setup
+
+```bash
+cd /Users/advaitpaliwal/Companion/Code/feynman
+npm install
+cp .env.example .env
+npm run start
+```
+
+If you already use `pi`, Feynman will reuse the usual auth/config locations for model access.
+
+Before deep paper work, make sure alphaXiv auth is set up:
+
+```bash
+npx @companion-ai/alpha-hub login
+```
+
+## Commands
+
+Inside the REPL:
+
+- `/help` shows local commands
+- `/new` starts a new persisted session
+- `/exit` quits
+- `/lit-review <topic>` expands the literature-review prompt template
+- `/replicate <paper or claim>` expands the replication prompt template
+- `/reading-list <topic>` expands the reading-list prompt template
+- `/paper-code-audit <item>` expands the paper/code audit prompt template
+- `/paper-draft <topic>` expands the paper-style writing prompt template
+
+## Custom Tools
+
+The starter extension adds:
+
+- `alpha_search` for alphaXiv-backed paper discovery
+- `alpha_get_paper` for fetching paper reports or raw text
+- `alpha_ask_paper` for targeted paper Q&A
+- `alpha_annotate_paper` for persistent local notes
+- `alpha_list_annotations` for recall across sessions
+- `alpha_read_code` for reading a paper repository
+
+Feynman uses `@companion-ai/alpha-hub` directly in-process rather than shelling out to the CLI.
+
+## Curated Pi Stack
+
+Feynman loads a lean research stack from [.pi/settings.json](/Users/advaitpaliwal/Companion/Code/feynman/.pi/settings.json):
+
+- `pi-subagents` for parallel literature gathering and decomposition
+- `pi-docparser` for PDFs, Office docs, spreadsheets, and images
+- `pi-web-access` for broader web, GitHub, PDF, and media access
+- `pi-markdown-preview` for polished Markdown and LaTeX-heavy research writeups
+- `@kaiserlich-dev/pi-session-search` for recall across long-running research threads
+- `@aliou/pi-processes` for long-running experiments and log tails
+- `pi-wandb` for experiment tracking
+- `pi-zotero` for citation-library workflows
+
+## Layout
+
+```text
+feynman/
+├── extensions/   # Custom research tools
+├── papers/       # Polished paper-style drafts and writeups
+├── prompts/      # Slash-style prompt templates
+├── skills/       # Research workflows
+└── src/          # Minimal REPL wrapper around pi-coding-agent
+```

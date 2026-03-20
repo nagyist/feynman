@@ -1,0 +1,12 @@
+{
+  "packages": [
+    "npm:pi-subagents",
+    "npm:pi-docparser",
+    "npm:pi-web-access",
+    "npm:pi-markdown-preview",
+    "npm:@kaiserlich-dev/pi-session-search",
+    "npm:@aliou/pi-processes",
+    "npm:pi-wandb",
+    "npm:pi-zotero"
+  ]
+}
