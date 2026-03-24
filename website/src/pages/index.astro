@@ -197,7 +197,7 @@ const terminalCommands = [
 </Layout>
 
 <script is:inline>
-  document.addEventListener("DOMContentLoaded", function () {
+  ;(function () {
     var btn = document.getElementById("install-cmd")
     if (btn) btn.addEventListener("click", function () {
       navigator.clipboard.writeText("curl -fsSL https://feynman.is/install | bash").then(function () {
@@ -211,7 +211,7 @@ const terminalCommands = [
         }, 2000)
       })
     })
-  })
+  })()
 
   fetch("https://api.github.com/repos/getcompanion-ai/feynman")
     .then(function(r) { return r.json() })
