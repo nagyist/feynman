@@ -14,8 +14,8 @@ export default defineConfig({
   markdown: {
     shikiConfig: {
       themes: {
-        light: 'everforest-light',
-        dark: 'everforest-dark',
+        light: 'vitesse-light',
+        dark: 'vitesse-dark',
       },
     },
   },
