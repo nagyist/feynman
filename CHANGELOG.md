@@ -50,3 +50,12 @@ Use this file to track chronology, not release notes. Keep entries short, factua
 - Failed / learned: A pooled statistical meta-analysis would be misleading because the literature mixes heterogeneous outcomes, scaling axes, and evaluation regimes; final deliverable uses a qualitative meta-analysis instead.
 - Blockers: None for this brief.
 - Next: If needed, extend into a narrower sub-survey (e.g. only pretraining laws, only inference-time scaling, or only post-Chinchilla data-quality revisions).
+
+### 2026-03-25 14:52 local — skills-only-install
+
+- Objective: Let users download the Feynman research skills without installing the full terminal runtime.
+- Changed: Added standalone skills-only installers at `scripts/install/install-skills.sh` and `scripts/install/install-skills.ps1`; synced website-public copies; documented user-level and repo-local install flows in `README.md`, `website/src/content/docs/getting-started/installation.md`, and `website/src/pages/index.astro`.
+- Verified: Ran `sh -n scripts/install/install-skills.sh`; ran `node scripts/sync-website-installers.mjs`; ran `cd website && npm run build`; executed `sh scripts/install/install-skills.sh --dir <tmp>` and confirmed extracted `SKILL.md` files land in the target directory.
+- Failed / learned: PowerShell installer behavior was not executed locally because PowerShell is not installed in this environment.
+- Blockers: None for the Unix installer flow; Windows remains syntax-only by inspection.
+- Next: If users want this exposed more prominently, add a dedicated docs/reference page and a homepage-specific skills-only CTA instead of a text link.

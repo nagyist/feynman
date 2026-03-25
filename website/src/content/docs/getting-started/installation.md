@@ -29,6 +29,36 @@ irm https://feynman.is/install.ps1 | iex
 
 This installs the Windows runtime bundle under `%LOCALAPPDATA%\Programs\feynman`, adds its launcher to your user `PATH`, and lets you re-run the installer at any time to update.
 
+## Skills only
+
+If you only want Feynman's research skills and not the full terminal runtime, install the skill library separately.
+
+For a user-level install into `~/.codex/skills/feynman`:
+
+```bash
+curl -fsSL https://feynman.is/install-skills | bash
+```
+
+For a repo-local install into `.agents/skills/feynman` under the current repository:
+
+```bash
+curl -fsSL https://feynman.is/install-skills | bash -s -- --repo
+```
+
+On Windows, install the skills into your Codex skill directory:
+
+```powershell
+irm https://feynman.is/install-skills.ps1 | iex
+```
+
+Or install them repo-locally:
+
+```powershell
+& ([scriptblock]::Create((irm https://feynman.is/install-skills.ps1))) -Scope Repo
+```
+
+These installers download only the `skills/` tree from the Feynman repository. They do not install the Feynman terminal, bundled Node runtime, auth storage, or Pi packages.
+
 ## Stable or pinned releases
 
 If you want the latest tagged release instead of the rolling `edge` channel:

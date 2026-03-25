@@ -19,6 +19,24 @@ curl -fsSL https://feynman.is/install | bash
 
 If you install via `pnpm` or `bun` instead of the standalone bundle, Feynman requires Node.js `20.18.1` or newer.
 
+### Skills Only
+
+If you want just the research skills without the full terminal app:
+
+```bash
+curl -fsSL https://feynman.is/install-skills | bash
+```
+
+That installs the skill library into `~/.codex/skills/feynman`.
+
+For a repo-local install instead:
+
+```bash
+curl -fsSL https://feynman.is/install-skills | bash -s -- --repo
+```
+
+That installs into `.agents/skills/feynman` under the current repository.
+
 ---
 
 ### What you type → what happens
