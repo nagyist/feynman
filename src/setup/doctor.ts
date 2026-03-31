@@ -10,6 +10,7 @@ import { printInfo, printPanel, printSection } from "../ui/terminal.js";
 import { getCurrentModelSpec } from "../model/commands.js";
 import { buildModelStatusSnapshotFromRecords, getAvailableModelRecords, getSupportedModelRecords } from "../model/catalog.js";
 import { createModelRegistry, getModelsJsonPath } from "../model/registry.js";
+import { getConfiguredServiceTier } from "../model/service-tier.js";
 
 function findProvidersMissingApiKey(modelsJsonPath: string): string[] {
 	try {
@@ -105,6 +106,7 @@ export function runStatus(options: DoctorOptions): void {
 	printInfo(`Recommended model: ${snapshot.recommendedModel ?? "not available"}`);
 	printInfo(`alphaXiv: ${snapshot.alphaLoggedIn ? snapshot.alphaUser ?? "configured" : "not configured"}`);
 	printInfo(`Web access: pi-web-access (${snapshot.webRouteLabel})`);
+	printInfo(`Service tier: ${getConfiguredServiceTier(options.settingsPath) ?? "not set"}`);
 	printInfo(`Preview: ${snapshot.previewConfigured ? "configured" : "not configured"}`);
 
 	printSection("Paths");
@@ -165,6 +167,7 @@ export function runDoctor(options: DoctorOptions): void {
 	console.log(`default model valid: ${modelStatus.modelValid ? "yes" : "no"}`);
 	console.log(`authenticated providers: ${modelStatus.authenticatedProviderCount}`);
 	console.log(`authenticated models: ${modelStatus.authenticatedModelCount}`);
+	console.log(`service tier: ${getConfiguredServiceTier(options.settingsPath) ?? "not set"}`);
 	console.log(`recommended model: ${modelStatus.recommendedModel ?? "not available"}`);
 	if (modelStatus.recommendedModelReason) {
 		console.log(`  why: ${modelStatus.recommendedModelReason}`);

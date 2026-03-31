@@ -19,6 +19,7 @@ import { launchPiChat } from "./pi/launch.js";
 import { CORE_PACKAGE_SOURCES, getOptionalPackagePresetSources, listOptionalPackagePresets } from "./pi/package-presets.js";
 import { normalizeFeynmanSettings, normalizeThinkingLevel, parseModelSpec } from "./pi/settings.js";
 import { applyFeynmanPackageManagerEnv } from "./pi/runtime.js";
+import { getConfiguredServiceTier, normalizeServiceTier, setConfiguredServiceTier } from "./model/service-tier.js";
 import {
 	authenticateModelProvider,
 	getCurrentModelSpec,
@@ -148,6 +149,29 @@ async function handleModelCommand(subcommand: string | undefined, args: string[]
 			throw new Error("Usage: feynman model set <provider/model>");
 		}
 		setDefaultModelSpec(feynmanSettingsPath, feynmanAuthPath, spec);
+		return;
+	}
+
+	if (subcommand === "tier") {
+		const requested = args[0];
+		if (!requested) {
+			console.log(getConfiguredServiceTier(feynmanSettingsPath) ?? "not set");
+			return;
+		}
+
+		if (requested === "unset" || requested === "clear" || requested === "off") {
+			setConfiguredServiceTier(feynmanSettingsPath, undefined);
+			console.log("Cleared service tier override");
+			return;
+		}
+
+		const tier = normalizeServiceTier(requested);
+		if (!tier) {
+			throw new Error("Usage: feynman model tier <auto|default|flex|priority|standard_only|unset>");
+		}
+
+		setConfiguredServiceTier(feynmanSettingsPath, tier);
+		console.log(`Service tier set to ${tier}`);
 		return;
 	}
 
@@ -311,6 +335,7 @@ export async function main(): Promise<void> {
 			model: { type: "string" },
 			"new-session": { type: "boolean" },
 			prompt: { type: "string" },
+			"service-tier": { type: "string" },
 			"session-dir": { type: "string" },
 			"setup-preview": { type: "boolean" },
 			thinking: { type: "string" },
@@ -437,6 +462,13 @@ export async function main(): Promise<void> {
 	}
 
 	const explicitModelSpec = values.model ?? process.env.FEYNMAN_MODEL;
+	const explicitServiceTier = normalizeServiceTier(values["service-tier"] ?? process.env.FEYNMAN_SERVICE_TIER);
+	if ((values["service-tier"] ?? process.env.FEYNMAN_SERVICE_TIER) && !explicitServiceTier) {
+		throw new Error("Unknown service tier. Use auto, default, flex, priority, or standard_only.");
+	}
+	if (explicitServiceTier) {
+		process.env.FEYNMAN_SERVICE_TIER = explicitServiceTier;
+	}
 	if (explicitModelSpec) {
 		const modelRegistry = createModelRegistry(feynmanAuthPath);
 		const explicitModel = parseModelSpec(explicitModelSpec, modelRegistry);

@@ -19,6 +19,7 @@
     ".feynman/settings.json",
     ".feynman/SYSTEM.md",
     ".feynman/themes/",
+    ".feynman/vendor-overrides/",
     "extensions/",
     "prompts/",
     "logo.mjs",

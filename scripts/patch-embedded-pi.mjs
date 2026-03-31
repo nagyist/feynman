@@ -4,6 +4,7 @@ import { createRequire } from "node:module";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { FEYNMAN_LOGO_HTML } from "../logo.mjs";
+import { patchPiExtensionLoaderSource } from "./lib/pi-extension-loader-patch.mjs";
 import { PI_SUBAGENTS_PATCH_TARGETS, patchPiSubagentsSource } from "./lib/pi-subagents-patch.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -52,9 +53,11 @@ const cliPath = piPackageRoot ? resolve(piPackageRoot, "dist", "cli.js") : null;
 const bunCliPath = piPackageRoot ? resolve(piPackageRoot, "dist", "bun", "cli.js") : null;
 const interactiveModePath = piPackageRoot ? resolve(piPackageRoot, "dist", "modes", "interactive", "interactive-mode.js") : null;
 const interactiveThemePath = piPackageRoot ? resolve(piPackageRoot, "dist", "modes", "interactive", "theme", "theme.js") : null;
+const extensionLoaderPath = piPackageRoot ? resolve(piPackageRoot, "dist", "core", "extensions", "loader.js") : null;
 const terminalPath = piTuiRoot ? resolve(piTuiRoot, "dist", "terminal.js") : null;
 const editorPath = piTuiRoot ? resolve(piTuiRoot, "dist", "components", "editor.js") : null;
 const workspaceRoot = resolve(appRoot, ".feynman", "npm", "node_modules");
+const vendorOverrideRoot = resolve(appRoot, ".feynman", "vendor-overrides");
 const piSubagentsRoot = resolve(workspaceRoot, "pi-subagents");
 const webAccessPath = resolve(workspaceRoot, "pi-web-access", "index.ts");
 const sessionSearchIndexerPath = resolve(
@@ -179,6 +182,18 @@ function resolveExecutable(name, fallbackPaths = []) {
 		if (resolved) return resolved;
 	}
 	return null;
+}
+
+function syncVendorOverride(relativePath) {
+	const sourcePath = resolve(vendorOverrideRoot, relativePath);
+	const targetPath = resolve(workspaceRoot, relativePath);
+	if (!existsSync(sourcePath) || !existsSync(targetPath)) return;
+
+	const source = readFileSync(sourcePath, "utf8");
+	const current = readFileSync(targetPath, "utf8");
+	if (source !== current) {
+		writeFileSync(targetPath, source, "utf8");
+	}
 }
 
 function ensurePackageWorkspace() {
@@ -352,6 +367,14 @@ if (interactiveModePath && existsSync(interactiveModePath)) {
 	}
 }
 
+if (extensionLoaderPath && existsSync(extensionLoaderPath)) {
+	const source = readFileSync(extensionLoaderPath, "utf8");
+	const patched = patchPiExtensionLoaderSource(source);
+	if (patched !== source) {
+		writeFileSync(extensionLoaderPath, patched, "utf8");
+	}
+}
+
 if (interactiveThemePath && existsSync(interactiveThemePath)) {
 	let themeSource = readFileSync(interactiveThemePath, "utf8");
 	const desiredGetEditorTheme = [
@@ -517,6 +540,16 @@ if (editorPath && existsSync(editorPath)) {
 }
 
 if (existsSync(webAccessPath)) {
+	for (const relativePath of [
+		"pi-web-access/index.ts",
+		"pi-web-access/gemini-search.ts",
+		"pi-web-access/curator-page.ts",
+		"pi-web-access/curator-server.ts",
+		"pi-web-access/exa.ts",
+	]) {
+		syncVendorOverride(relativePath);
+	}
+
 	const source = readFileSync(webAccessPath, "utf8");
 	if (source.includes('pi.registerCommand("search",')) {
 		writeFileSync(
