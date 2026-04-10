@@ -1,6 +1,5 @@
-import { existsSync, readFileSync } from "node:fs";
-import { homedir } from "node:os";
-import { resolve } from "node:path";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
 import { getFeynmanHome } from "../config/paths.js";
 
 export type PiWebSearchProvider = "auto" | "perplexity" | "exa" | "gemini";
@@ -51,6 +50,23 @@ export function loadPiWebAccessConfig(configPath = getPiWebSearchConfigPath()): 
 	} catch {
 		return {};
 	}
+}
+
+export function savePiWebAccessConfig(
+	updates: Partial<Record<keyof PiWebAccessConfig, unknown>>,
+	configPath = getPiWebSearchConfigPath(),
+): void {
+	const merged: Record<string, unknown> = { ...loadPiWebAccessConfig(configPath) };
+	for (const [key, value] of Object.entries(updates)) {
+		if (value === undefined) {
+			delete merged[key];
+		} else {
+			merged[key] = value;
+		}
+	}
+
+	mkdirSync(dirname(configPath), { recursive: true });
+	writeFileSync(configPath, JSON.stringify(merged, null, 2) + "\n", "utf8");
 }
 
 function formatRouteLabel(provider: PiWebSearchProvider): string {

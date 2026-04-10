@@ -74,7 +74,6 @@ const workspaceExtensionLoaderPath = resolve(
 	"extensions",
 	"loader.js",
 );
-const vendorOverrideRoot = resolve(appRoot, ".feynman", "vendor-overrides");
 const piSubagentsRoot = resolve(workspaceRoot, "pi-subagents");
 const webAccessPath = resolve(workspaceRoot, "pi-web-access", "index.ts");
 const sessionSearchIndexerPath = resolve(
@@ -209,18 +208,6 @@ function resolveExecutable(name, fallbackPaths = []) {
 		if (resolved) return resolved;
 	}
 	return null;
-}
-
-function syncVendorOverride(relativePath) {
-	const sourcePath = resolve(vendorOverrideRoot, relativePath);
-	const targetPath = resolve(workspaceRoot, relativePath);
-	if (!existsSync(sourcePath) || !existsSync(targetPath)) return;
-
-	const source = readFileSync(sourcePath, "utf8");
-	const current = readFileSync(targetPath, "utf8");
-	if (source !== current) {
-		writeFileSync(targetPath, source, "utf8");
-	}
 }
 
 function ensurePackageWorkspace() {
@@ -571,16 +558,6 @@ if (editorPath && existsSync(editorPath)) {
 }
 
 if (existsSync(webAccessPath)) {
-	for (const relativePath of [
-		"pi-web-access/index.ts",
-		"pi-web-access/gemini-search.ts",
-		"pi-web-access/curator-page.ts",
-		"pi-web-access/curator-server.ts",
-		"pi-web-access/exa.ts",
-	]) {
-		syncVendorOverride(relativePath);
-	}
-
 	const source = readFileSync(webAccessPath, "utf8");
 	if (source.includes('pi.registerCommand("search",')) {
 		writeFileSync(

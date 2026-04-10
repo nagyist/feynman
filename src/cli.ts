@@ -28,7 +28,8 @@ import {
 	printModelList,
 	setDefaultModelSpec,
 } from "./model/commands.js";
-import { printSearchStatus } from "./search/commands.js";
+import { clearSearchConfig, printSearchStatus, setSearchProvider } from "./search/commands.js";
+import type { PiWebSearchProvider } from "./pi/web-access.js";
 import { runDoctor, runStatus } from "./setup/doctor.js";
 import { setupPreviewDependencies } from "./setup/preview.js";
 import { runSetup } from "./setup/setup.js";
@@ -269,9 +270,24 @@ async function handlePackagesCommand(subcommand: string | undefined, args: strin
 	console.log("Optional packages installed.");
 }
 
-function handleSearchCommand(subcommand: string | undefined): void {
+function handleSearchCommand(subcommand: string | undefined, args: string[]): void {
 	if (!subcommand || subcommand === "status") {
 		printSearchStatus();
+		return;
+	}
+
+	if (subcommand === "set") {
+		const provider = args[0] as PiWebSearchProvider | undefined;
+		const validProviders: PiWebSearchProvider[] = ["auto", "perplexity", "exa", "gemini"];
+		if (!provider || !validProviders.includes(provider)) {
+			throw new Error("Usage: feynman search set <auto|perplexity|exa|gemini> [api-key]");
+		}
+		setSearchProvider(provider, args[1]);
+		return;
+	}
+
+	if (subcommand === "clear") {
+		clearSearchConfig();
 		return;
 	}
 
@@ -442,7 +458,7 @@ export async function main(): Promise<void> {
 	}
 
 	if (command === "search") {
-		handleSearchCommand(rest[0]);
+		handleSearchCommand(rest[0], rest.slice(1));
 		return;
 	}
 

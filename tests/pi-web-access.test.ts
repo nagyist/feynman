@@ -9,6 +9,7 @@ import {
 	getPiWebAccessStatus,
 	getPiWebSearchConfigPath,
 	loadPiWebAccessConfig,
+	savePiWebAccessConfig,
 } from "../src/pi/web-access.js";
 
 test("loadPiWebAccessConfig returns empty config when Pi web config is missing", () => {
@@ -20,6 +21,26 @@ test("loadPiWebAccessConfig returns empty config when Pi web config is missing",
 
 test("getPiWebSearchConfigPath respects FEYNMAN_HOME semantics", () => {
 	assert.equal(getPiWebSearchConfigPath("/tmp/custom-home"), "/tmp/custom-home/.feynman/web-search.json");
+});
+
+test("savePiWebAccessConfig merges updates and deletes undefined values", () => {
+	const root = mkdtempSync(join(tmpdir(), "feynman-pi-web-"));
+	const configPath = getPiWebSearchConfigPath(root);
+
+	savePiWebAccessConfig({
+		provider: "perplexity",
+		searchProvider: "perplexity",
+		perplexityApiKey: "pplx_...",
+	}, configPath);
+	savePiWebAccessConfig({
+		provider: undefined,
+		searchProvider: undefined,
+		route: undefined,
+	}, configPath);
+
+	assert.deepEqual(loadPiWebAccessConfig(configPath), {
+		perplexityApiKey: "pplx_...",
+	});
 });
 
 test("getPiWebAccessStatus reads Pi web-access config directly", () => {
